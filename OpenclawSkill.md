@@ -34,6 +34,14 @@ this will check the health, and if not setup, it will prompt you to set up the C
 - `shsf get namespace <id>`: Get details of a specific namespace by its ID
 - `shsf get trigger <functionId> <triggerId>`: Get details of a specific trigger from a function.
 
+- `shsf storage create --name <name> --purpose <purpose>`: Create a new storage.
+- `shsf storage delete --name <name>`: Delete a storage.
+- `shsf storage list`: List all storages.
+- `shsf storage get-items --name <name>`: List all items in a storage.
+- `shsf storage set-item --name <name> --key <key> --value <value> [--expires <expires>]`: Set a storage item (value can be JSON).
+- `shsf storage delete-item --name <name> --key <key>`: Delete a storage item.
+- `shsf storage clear-items --name <name>`: Clear all items from a storage.
+
 - `shsf update function <id>`: Update a specific serverless function by its ID. (use `shsf update function -h` first)
 - `shsf update namespace <id>`: Update a specific namespace by its ID. (use `shsf update namespace -h` first)
 - `shsf update trigger <functionId> <triggerId>`: Update a specific trigger from a function. (use `shsf update trigger -h` first)
