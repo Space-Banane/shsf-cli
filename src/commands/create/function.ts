@@ -14,8 +14,26 @@ export const createFunctionDefinition = {
     { name: "--docker-mount", description: "Enable Docker mount", type: "boolean" },
     { name: "--ffmpeg-install", description: "Install ffmpeg in container", type: "boolean" },
     { name: "--imported", description: "Marks the function as imported", type: "boolean" },
+    { name: "--cache-enabled <enabled>", description: "Enable response caching (true/false)" },
+    { name: "--cache-ttl <seconds>", description: "Cache TTL in seconds" },
   ],
   action: async (options: any) => {
+    let parsedCacheEnabled: boolean | undefined;
+    if (options.cacheEnabled !== undefined) {
+      const normalized = String(options.cacheEnabled).toLowerCase();
+      if (normalized !== "true" && normalized !== "false") {
+        console.error(`${chalk.red("✗")} Invalid value for --cache-enabled. Use true or false.`);
+        return;
+      }
+      parsedCacheEnabled = normalized === "true";
+    }
+
+    const parsedCacheTtl = options.cacheTtl !== undefined ? Number(options.cacheTtl) : undefined;
+    if (parsedCacheTtl !== undefined && Number.isNaN(parsedCacheTtl)) {
+      console.error(`${chalk.red("✗")} Invalid value for --cache-ttl. Please provide a number.`);
+      return;
+    }
+
     const data = {
       name: options.name,
       description: options.description,
@@ -26,6 +44,8 @@ export const createFunctionDefinition = {
       docker_mount: !!options.dockerMount,
       ffmpeg_install: !!options.ffmpegInstall,
       imported: !!options.imported,
+      cache_enabled: parsedCacheEnabled,
+      cache_ttl: parsedCacheTtl,
     };
 
     const client = await getApiClient();

@@ -1,0 +1,48 @@
+---
+name: shsf
+description: Interact with the users shsf instance to manage serverless functions, namespaces, triggers, schedules, and more via the CLI.
+---
+
+# SHSF - Selfhostable Serverless Functions; THE CLI
+The `shsf` CLI tool allows you to interact with your shsf instance to manage serverless functions, namespaces, triggers, schedules, and more. Below are the available commands and their descriptions.
+
+## Setup
+To get started, you need to set up the `shsf` CLI tool. Follow the instructions below to install and configure it.
+
+1. Run this
+```bash
+shsf health
+```
+this will check the health, and if not setup, it will prompt you to set up the CLI.
+
+## Commands
+
+### Count
+- `shsf count functions`: Count your functions. Add `--full` to list them.
+- `shsf count namespaces`: Count your namespaces. Add `--full` to list them.
+- `shsf count storages`: Count your storages. Add `--full` to list them.
+- `shsf count triggers`: Count your triggers. Add `--full` to list them.
+
+- `shsf create function`: Create a new function. (use `shsf create function -h` first)
+- `shsf create namespace`: Create a new namespace. (use `shsf create namespace -h` first)
+- `shsf create trigger`: Create a new trigger. (use `shsf create trigger -h` first)
+
+- `shsf delete function <id>`: Deletes a specific serverless function by its ID.
+- `shsf delete namespace <id>`: Deletes a namespace and all its functions by ID.
+- `shsf delete trigger <functionId> <triggerId>`: Deletes a specific trigger from a function.
+
+- `shsf get function <id>`: Get details of a specific function by its ID.
+- `shsf get namespace <id>`: Get details of a specific namespace by its ID
+- `shsf get trigger <functionId> <triggerId>`: Get details of a specific trigger from a function.
+
+- `shsf update function <id>`: Update a specific serverless function by its ID. (use `shsf update function -h` first)
+- `shsf update namespace <id>`: Update a specific namespace by its ID. (use `shsf update namespace -h` first)
+- `shsf update trigger <functionId> <triggerId>`: Update a specific trigger from a function. (use `shsf update trigger -h` first)
+
+- `shsf file create`: Create a file in a storage. (use `shsf file create -h` first)
+- `shsf file overwrite`: Overwrite an existing file in a storage. (use `shsf file overwrite -h` first)
+- `shsf file delete`: Delete a file from a storage. (use `shsf file delete -h` first)
+- `shsf file list`: List files in a storage. (use `shsf file list -h` first)
+
+## Instructions
+Use these commands for when you need to interact with shsf from the command line. Its faster than using the ui for almost all ops.

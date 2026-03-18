@@ -4,12 +4,15 @@ import { getApiClient } from "../../api.js";
 export const functionsCountDefinition = {
   name: "functions",
   description: "Counts the amount of functions the current user has.",
-  action: async () => {
-    await countFunctions();
+  options: [
+    { name: "--full", description: "List all functions instead of just the count", type: "boolean" },
+  ],
+  action: async (options: any) => {
+    await countFunctions(options?.full);
   },
 };
 
-async function countFunctions() {
+async function countFunctions(full: boolean = false) {
   const client = await getApiClient();
 
   try {
@@ -19,7 +22,7 @@ async function countFunctions() {
       const functions = response.data.data;
       const count = functions.length;
 
-      if (count > 0) {
+      if (full && count > 0) {
         console.log(chalk.blue("Functions List:"));
         functions.forEach((f: any) => {
           const namespaceInfo = f.namespace ? chalk.gray(` [NS: ${f.namespace.id}]`) : "";

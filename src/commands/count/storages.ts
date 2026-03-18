@@ -4,12 +4,15 @@ import { getApiClient } from "../../api.js";
 export const storagesCountDefinition = {
   name: "storages",
   description: "Counts the amount of storages the current user has.",
-  action: async () => {
-    await countStorages();
+  options: [
+    { name: "--full", description: "List all storages instead of just the count", type: "boolean" },
+  ],
+  action: async (options: any) => {
+    await countStorages(options?.full);
   },
 };
 
-async function countStorages() {
+async function countStorages(full: boolean = false) {
   const client = await getApiClient();
 
   try {
@@ -19,7 +22,7 @@ async function countStorages() {
       const storages = response.data.data;
       const count = storages.length;
 
-      if (count > 0) {
+      if (full && count > 0) {
         console.log(chalk.blue("Storages List:"));
         storages.forEach((s: any) => {
           const purposeInfo = s.purpose ? chalk.gray(` - ${s.purpose}`) : "";

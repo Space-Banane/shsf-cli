@@ -4,12 +4,15 @@ import { getApiClient } from "../../api.js";
 export const triggersCountDefinition = {
   name: "triggers",
   description: "Counts the amount of triggers the current user has.",
-  action: async () => {
-    await countTriggers();
+  options: [
+    { name: "--full", description: "List all triggers instead of just the count", type: "boolean" },
+  ],
+  action: async (options: any) => {
+    await countTriggers(options?.full);
   },
 };
 
-async function countTriggers() {
+async function countTriggers(full: boolean = false) {
   const client = await getApiClient();
 
   try {
@@ -19,7 +22,7 @@ async function countTriggers() {
       const triggers = response.data.data;
       const count = triggers.length;
 
-      if (count > 0) {
+      if (full && count > 0) {
         console.log(chalk.blue("Triggers List:"));
         triggers.forEach((t: any) => {
           const functionInfo = t.function ? chalk.gray(` [Func: ${t.function.name}]`) : "";

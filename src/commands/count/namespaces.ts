@@ -4,12 +4,15 @@ import { getApiClient } from "../../api.js";
 export const namespacesCountDefinition = {
   name: "namespaces",
   description: "Counts the amount of namespaces the current user has.",
-  action: async () => {
-    await countNamespaces();
+  options: [
+    { name: "--full", description: "List all namespaces instead of just the count", type: "boolean" },
+  ],
+  action: async (options: any) => {
+    await countNamespaces(options?.full);
   },
 };
 
-async function countNamespaces() {
+async function countNamespaces(full: boolean = false) {
   const client = await getApiClient();
 
   try {
@@ -19,7 +22,7 @@ async function countNamespaces() {
       const namespaces = response.data.data;
       const count = namespaces.length;
 
-      if (count > 0) {
+      if (full && count > 0) {
         console.log(chalk.blue("Namespaces List:"));
         namespaces.forEach((ns: any) => {
           console.log(`- ${chalk.cyan(ns.name)} ${chalk.gray(`(${ns.id})`)}`);
