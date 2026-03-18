@@ -74,12 +74,18 @@ jobs:
         with:
           name: dist-artifact
 
+      - name: Get version from package.json
+        id: package_version
+        run: |
+          pkg_version=$(node -p "require('./package.json').version")
+          echo "VERSION=$pkg_version" >> $GITHUB_OUTPUT
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           files: dist.zip
-          tag_name: v${{ github.run_number }}
-          name: Release v${{ github.run_number }}
+          tag_name: v${{ steps.package_version.outputs.VERSION }}
+          name: Release v${{ steps.package_version.outputs.VERSION }}
           draft: false
           prerelease: false
         env:

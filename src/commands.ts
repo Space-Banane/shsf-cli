@@ -55,10 +55,21 @@ export async function resolveCommands() {
     const definition = module.default || Object.values(module).find((val: any) => val && val.name && val.action);
 
     if (definition && definition.name && definition.action) {
-      currentParent
+      const command = currentParent
         .command(definition.name)
-        .description(definition.description || '')
-        .action(definition.action);
+        .description(definition.description || '');
+
+      if (definition.options) {
+        definition.options.forEach((opt: any) => {
+          if (opt.required) {
+            command.requiredOption(opt.name, opt.description);
+          } else {
+            command.option(opt.name, opt.description);
+          }
+        });
+      }
+
+      command.action(definition.action);
     }
   }
 }
