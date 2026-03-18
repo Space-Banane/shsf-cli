@@ -24,6 +24,15 @@ jobs:
       - run: pnpm install --no-frozen-lockfile
       - run: pnpm build
 
+      - name: Zip dist directory
+        run: zip -r dist.zip dist/
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-artifact
+          path: dist.zip
+
   publish:
     name: Publish to NPM
     needs: build
@@ -39,10 +48,39 @@ jobs:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
 
-      - run: pnpm install --no-frozen-lockfile
-      - run: pnpm build
+      - name: Download dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-artifact
+
+      - run: unzip dist.zip
       
       - run: pnpm publish --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+  release:
+    name: Create GitHub Release
+    needs: publish
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-artifact
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist.zip
+          tag_name: v${{ github.run_number }}
+          name: Release v${{ github.run_number }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
