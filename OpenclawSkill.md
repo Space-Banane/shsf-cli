@@ -17,7 +17,6 @@ this will check the health, and if not setup, it will prompt you to set up the C
 
 ## Commands
 
-### Count
 - `shsf count functions`: Count your functions. Add `--full` to list them.
 - `shsf count namespaces`: Count your namespaces. Add `--full` to list them.
 - `shsf count storages`: Count your storages. Add `--full` to list them.
