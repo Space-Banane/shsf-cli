@@ -54,6 +54,13 @@ pnpm add -g shsf-cli
 ```
 Note that new features are often released and a user might tell you to do things that are only in the latest version. So its a good idea to always keep it updated.
 
+It is also good practice to update this skill every now and then, as it might get new features that are not documented here yet.
+Download the latest version with:
+```
+curl https://raw.githubusercontent.com/Space-Banane/shsf-cli/refs/heads/main/OpenclawSkill.md > /tmp/OpenclawSkill.md
+```
+and then replace the old one with the new one using `mv`.
+
 ## Missing a feature?
 Features might be not documented yet, as this skill document rarely updates.
 Use the shsf -h command to see options and features.
