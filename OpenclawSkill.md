@@ -46,3 +46,14 @@ this will check the health, and if not setup, it will prompt you to set up the C
 
 ## Instructions
 Use these commands for when you need to interact with shsf from the command line. Its faster than using the ui for almost all ops.
+
+## Update
+Update with your package manager of choice. Preferably pnpm:
+```bash
+pnpm add -g shsf-cli
+```
+Note that new features are often released and a user might tell you to do things that are only in the latest version. So its a good idea to always keep it updated.
+
+## Missing a feature?
+Features might be not documented yet, as this skill document rarely updates.
+Use the shsf -h command to see options and features.

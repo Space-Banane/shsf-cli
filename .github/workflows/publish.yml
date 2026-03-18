@@ -4,9 +4,15 @@ on:
   push:
     branches:
       - '**'
+    paths:
+      - '**/*.ts'
+      - '**/*.json'
   pull_request:
     branches:
       - main
+    paths:
+      - '**/*.ts'
+      - '**/*.json'
 
 jobs:
   build:
