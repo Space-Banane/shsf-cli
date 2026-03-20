@@ -26,6 +26,8 @@ export const pullDefinition = {
       }
       for (const file of files) {
         fs.writeFileSync(path.join(options.into, file.name), file.content);
+        const byteSize = Buffer.byteLength(file.content, 'utf8');
+        console.log(chalk.green(`Pulled ${file.name} (${byteSize} bytes)`));
       }
       console.log(chalk.green(`Successfully pulled ${files.length} files into ${options.into}`));
     } catch (error: any) {
