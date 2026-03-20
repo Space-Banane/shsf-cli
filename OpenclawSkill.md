@@ -94,7 +94,7 @@ After creating a function and receiving an ID (for example, 81), you can share t
 ```
 
 ## Update
-Update with your package manager of choice. Preferably pnpm:
+Update with your package manager of choice. ALWAYS pnpm:
 ```bash
 pnpm add -g shsf-cli
 ```
