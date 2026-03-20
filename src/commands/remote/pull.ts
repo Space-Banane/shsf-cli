@@ -15,8 +15,8 @@ export const pullDefinition = {
     const client = await getApiClient();
 
     try {
-      const response = await client.get(`/functions/${options.id}/files`);
-      const files = response.data; // Expecting { filename: string, content: string }[]
+      const response = await client.get(`/api/function/${options.id}/files`);
+      const files = response.data.data; // Expecting { name: string, content: string }[]
 
       if (!fs.existsSync(options.into)) {
         fs.mkdirSync(options.into, { recursive: true });
@@ -24,9 +24,8 @@ export const pullDefinition = {
         console.error(chalk.red(`Directory ${options.into} is not empty. Use --force to overwrite.`));
         return;
       }
-
       for (const file of files) {
-        fs.writeFileSync(path.join(options.into, file.filename), file.content);
+        fs.writeFileSync(path.join(options.into, file.name), file.content);
       }
       console.log(chalk.green(`Successfully pulled ${files.length} files into ${options.into}`));
     } catch (error: any) {
