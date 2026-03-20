@@ -24,3 +24,6 @@
 - **New Commands**: To add a command, create a new file in `src/commands/` (or a subfolder). It must export a definition object (default or named) with `name`, `description`, and `action`.
 - **Error Handling**: Follow the pattern in [src/commands/health.ts](src/commands/health.ts) for handling Axios errors (check for `error.response`, `error.request`, etc.).
 - **No Global Scope**: Keep command logic within the `action` function or extracted to utility modules to maintain testability.
+
+## Versioning
+- **Versioning**: Always increment the version number in package.json whenever a change is merged into main. The version format is major.minor.patch.
