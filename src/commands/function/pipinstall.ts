@@ -42,6 +42,13 @@ async function pipInstallFunction(id: string) {
       console.error(
         `Message: ${chalk.yellow(error.response.data?.message || "Unknown error from server")}`,
       );
+    } else if (error.request) {
+      console.error(
+        `${chalk.red("✗")} Failed to install dependencies.`,
+      );
+      console.error(
+        `${chalk.yellow("Could not connect to the SHSF instance. Check your connection.")}`,
+      );
     } else {
       console.error(`${chalk.red("✗")} Error:`, error.message);
     }
