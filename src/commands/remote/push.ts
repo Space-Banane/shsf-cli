@@ -97,8 +97,9 @@ export const pushDefinition = {
           code: file.content,
         });
 
+        const byteSize = Buffer.byteLength(file.content, 'utf8');
         console.log(
-          chalk.green(`Pushed ${file.filename} to function ${options.id}`),
+          chalk.green(`Pushed ${file.filename} (${byteSize} bytes) to function ${options.id}`),
         );
         pushedFilesCount++;
       }
