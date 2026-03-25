@@ -53,6 +53,9 @@ this will check the health, and if not setup, it will prompt you to set up the C
 - `shsf remote pull --id <id> --into <path> [--force]`: Pull files from a function into a local directory.
 - `shsf remote push --id <id> --from <path> [--force]`: Push files from a local directory to a function.
 
+- `shsf req add <package> --id <id>`: Add a package to a function's requirements.txt. Strips version specifiers (e.g., `requests==2.28.0` becomes `requests`).
+- `shsf req remove <package> --id <id>`: Remove a package from a function's requirements.txt.
+
 ## Instructions
 Use these commands for when you need to interact with shsf from the command line. Its faster than using the ui for almost all ops.
 
