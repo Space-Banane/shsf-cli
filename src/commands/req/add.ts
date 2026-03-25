@@ -7,7 +7,7 @@ export const reqAddDefinition = {
   options: [
     { name: "--id <id>", description: "Function ID", required: true },
   ],
-  action: async (options: { id: string }, packageName: string) => {
+  action: async (packageName: string, options: { id: string }) => {
     await modifyRequirements(options.id, packageName, "add");
   },
 };
