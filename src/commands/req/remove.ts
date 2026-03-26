@@ -10,17 +10,21 @@ export const reqRemoveDefinition = {
   name: "remove <package>",
   description: "Remove a package from the requirements.txt of a function.",
   options: [
-    { name: "--from <id>", description: "The ID of the function.", required: true },
+    { name: "--from <id>", description: "The ID of the function (deprecated alias for --id)." },
+    { name: "--id <id>", description: "The ID of the function.", required: true },
   ],
-  action: async (pkgToRemove: string, options: { from: string }) => {
-    const functionId = options.from;
+  action: async (pkgToRemove: string, options: { from?: string; id?: string }) => {
+    const functionId = options.id ?? options.from;
+    if (!functionId) {
+      console.error(`${chalk.red("✗")} Error: Function ID is required. Use ${chalk.cyan("--id <id>")}.`);
+      return;
+    }
     const client = await getApiClient();
 
     try {
       // 1. Get current files of the function
       const response = await client.get(`/api/function/${functionId}/files`);
       let files: ShsfFile[] = response.data.data;
-
       if (!Array.isArray(files)) files = [];
 
       const requirementsFile = files.find(f => f.name === "requirements.txt");
@@ -32,25 +36,38 @@ export const reqRemoveDefinition = {
       const content = requirementsFile.content;
       const lines = content.split("\n");
       
-      const pkgName = pkgToRemove.trim().toLowerCase();
+      const targetPkgName = pkgToRemove.trim().toLowerCase();
+      let removed = false;
       
       const newLines = lines.filter(line => {
         const trimmedLine = line.trim();
-        if (!trimmedLine) return false; // remove empty lines
+        // Preserve empty/whitespace-only lines
+        if (!trimmedLine) return true;
         
-        // Extract package name from the line (everything before version specifiers)
-        const currentPkgName = trimmedLine.split(/[=>~<]/)[0].trim().toLowerCase();
+        // Strip inline comments and environment markers for matching purposes
+        const withoutComment = trimmedLine.split("#", 1)[0];
+        const basePart = withoutComment.split(";", 1)[0].trim();
+
+        // If there's no actual requirement (e.g., comment-only line), keep the line
+        if (!basePart) return true;
+
+        // Robust extraction (handles != <= >= ~= == and < >)
+        const currentPkgName = basePart.split(/[!=>~<]/)[0].trim().toLowerCase();
         
-        // Match only exactly the package name
-        return currentPkgName !== pkgName;
+        if (currentPkgName === targetPkgName) {
+          removed = true;
+          return false;
+        }
+
+        return true;
       });
 
-      if (lines.length === newLines.length) {
+      if (!removed) {
         console.log(`${chalk.yellow("!")} Package ${chalk.cyan(pkgToRemove)} was not found in requirements.txt.`);
         return;
       }
 
-      const newContent = newLines.join("\n") + (newLines.length > 0 ? "\n" : "");
+      const newContent = newLines.join("\n");
 
       // 2. Get function details to find storageId
       const funcResponse = await client.get(`/api/function/${functionId}`);
@@ -76,6 +93,12 @@ export const reqRemoveDefinition = {
 function handleError(error: any, task: string) {
   if (error.response) {
     console.error(`${chalk.red("✗")} Failed to ${task}: ${chalk.yellow(error.response.data?.message || error.message)}`);
+  } else if (error.request) {
+    console.error(
+      `${chalk.red("✗")} Failed to ${task}: ${chalk.yellow(
+        "No response received from server. Please check your network connection and try again."
+      )}`
+    );
   } else {
     console.error(`${chalk.red("✗")} Error: ${error.message}`);
   }
