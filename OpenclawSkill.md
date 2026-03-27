@@ -52,6 +52,11 @@ this will check the health, and if not setup, it will prompt you to set up the C
 - `shsf file rename`: Rename a file in a function. (use `shsf file rename -h` first)
 - `shsf file delete`: Delete a file from a function. (use `shsf file delete -h` first)
 
+- `shsf env add --id <id> --name <name> --value <value>`: Adds or updates an environment variable for a function.
+- `shsf env remove --id <id> --name <name>`: Removes a specific environment variable from a function.
+- `shsf env list --id <id>`: Lists all environment variables for a function.
+- `shsf env flush --id <id>`: Removes ALL environment variables from a function.
+
 - `shsf remote pull --id <id> --into <path> [--force]`: Pull files from a function into a local directory.
 - `shsf remote push --id <id> --from <path> [--force]`: Push files from a local directory to a function.
 
@@ -66,33 +71,6 @@ Get the ui url with:
 ```bash
 shsf uiurl
 ```
-
-## Available UI Routes
-
-Below are the main routes you can use in the SHSF web UI. These are not clickable links, but you can navigate to them in your browser.
-
-**General**
-- `/`: Home Page
-
-**Documentation**
-- `/docs`: Documentation
-
-**Account**
-- `/account`: Account Settings
-- `/login`: Login
-- `/register`: Register
-
-**Functions**
-- `/functions`: Shows your functions, grouped by their respective namespaces (requires auth).
-- `/functions/:id`: View details for a specific function (requires auth).
-
-**Other**
-- `/admin`: Admin dashboard (admin only, requires authentication)
-- `/storage`: Storage management (requires auth)
-- `/cron-jobs`: Cron job management (requires auth)
-- `/access-tokens`: Access token management (requires auth)
-- `/guest-users`: Guest user management (requires auth)
-- `/guest-access`: Guest access portal
 
 ### Example
 After creating a function and receiving an ID (for example, 81), you can share the following URL with your human so they can view the function in the UI:
