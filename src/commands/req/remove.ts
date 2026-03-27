@@ -69,18 +69,10 @@ export const reqRemoveDefinition = {
 
       const newContent = newLines.join("\n");
 
-      // 2. Get function details to find storageId
-      const funcResponse = await client.get(`/api/function/${functionId}`);
-      const func = funcResponse.data.data;
-      if (!func || !func.namespace || !func.namespace.storageId) {
-        throw new Error("Could not determine storage ID for function.");
-      }
-      const storageId = func.namespace.storageId;
-
-      // 3. Overwrite requirements.txt
-      await client.put(`/api/storage/${storageId}/files`, {
-        path: "requirements.txt",
-        content: newContent
+      // 2. Overwrite requirements.txt using function-based API
+      await client.put(`/api/function/${functionId}/file`, {
+        filename: "requirements.txt",
+        code: newContent,
       });
 
       console.log(`${chalk.green("✓")} Removed ${chalk.cyan(pkgToRemove)} from requirements.txt for function ${chalk.yellow(functionId)}.`);
@@ -92,7 +84,7 @@ export const reqRemoveDefinition = {
 
 function handleError(error: any, task: string) {
   if (error.response) {
-    console.error(`${chalk.red("✗")} Failed to ${task}: ${chalk.yellow(error.response.data?.message || error.message)}`);
+    console.error(`${chalk.red("✗")} Failed to ${task}: ${chalk.yellow(error.response.data?.message || (error.response.data ? JSON.stringify(error.response.data) : error.message))}`);
   } else if (error.request) {
     console.error(
       `${chalk.red("✗")} Failed to ${task}: ${chalk.yellow(
