@@ -33,6 +33,8 @@ this will check the health, and if not setup, it will prompt you to set up the C
 - `shsf get namespace <id>`: Get details of a specific namespace by its ID
 - `shsf get trigger <functionId> <triggerId>`: Get details of a specific trigger from a function.
 
+- `shsf execute --id <id> [--payload <json>] [--no-stream]`: Execute a function and stream the output (debug/internal).
+
 - `shsf storage create --name <name> --purpose <purpose>`: Create a new storage.
 - `shsf storage delete --name <name>`: Delete a storage.
 - `shsf storage list`: List all storages.
