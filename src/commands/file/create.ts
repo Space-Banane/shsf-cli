@@ -4,10 +4,10 @@ import { getApiClient } from "../../api.js";
 
 export const fileCreateDefinition = {
   name: "create",
-  description: "Create a file in a storage.",
+  description: "Create or update a file in a function.",
   options: [
-    { name: "--storage-id <id>", description: "Storage ID", required: true },
-    { name: "--path <path>", description: "Remote file path", required: true },
+    { name: "--function-id <id>", description: "Function ID", required: true },
+    { name: "--filename <name>", description: "Remote filename", required: true },
     { name: "--content <content>", description: "Inline file content" },
     { name: "--source <source>", description: "Local source file path" },
   ],
@@ -34,16 +34,16 @@ export const fileCreateDefinition = {
 
     const client = await getApiClient();
     const payload = {
-      path: options.path,
-      content,
+      filename: options.filename,
+      code: content,
     };
 
     try {
-      const response = await client.post(`/api/storage/${options.storageId}/files`, payload);
+      const response = await client.put(`/api/function/${options.functionId}/file`, payload);
 
       if (response.status === 200 || response.status === 201) {
         console.log(
-          `${chalk.green("✓")} File ${chalk.cyan(options.path)} created successfully in storage ${chalk.cyan(options.storageId)}.`,
+          `${chalk.green("✓")} File ${chalk.cyan(options.filename)} created/updated successfully in function ${chalk.cyan(options.functionId)}.`,
         );
       } else {
         console.log(`${chalk.yellow("!")} Unexpected response from server: ${response.status}`);
@@ -51,7 +51,7 @@ export const fileCreateDefinition = {
     } catch (error: any) {
       if (error.response) {
         console.error(
-          `${chalk.red("✗")} Failed to create file: ${chalk.yellow(error.response.data?.message || "Unknown error")}`,
+          `${chalk.red("✗")} Failed to create/update file: ${chalk.yellow(error.response.data?.message || "Unknown error")}`,
         );
       } else if (error.request) {
         console.error(`${chalk.red("✗")} No response received from server.`);

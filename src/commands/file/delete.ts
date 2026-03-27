@@ -3,22 +3,20 @@ import { getApiClient } from "../../api.js";
 
 export const fileDeleteDefinition = {
   name: "delete",
-  description: "Delete a file from a storage.",
+  description: "Delete a file from a function.",
   options: [
-    { name: "--storage-id <id>", description: "Storage ID", required: true },
-    { name: "--path <path>", description: "Remote file path", required: true },
+    { name: "--function-id <id>", description: "Function ID", required: true },
+    { name: "--file-id <id>", description: "File ID (from 'file list')", required: true },
   ],
   action: async (options: any) => {
     const client = await getApiClient();
 
     try {
-      const response = await client.delete(`/api/storage/${options.storageId}/files`, {
-        data: { path: options.path },
-      });
+      const response = await client.delete(`/api/function/${options.functionId}/file/${options.fileId}`);
 
       if (response.status === 200) {
         console.log(
-          `${chalk.green("✓")} File ${chalk.cyan(options.path)} deleted from storage ${chalk.cyan(options.storageId)}.`,
+          `${chalk.green("✓")} File ${chalk.cyan(options.fileId)} deleted from function ${chalk.cyan(options.functionId)}.`,
         );
       } else {
         console.log(`${chalk.yellow("!")} Unexpected response from server: ${response.status}`);
@@ -26,7 +24,7 @@ export const fileDeleteDefinition = {
     } catch (error: any) {
       if (error.response) {
         if (error.response.status === 404) {
-          console.error(`${chalk.red("✗")} File ${chalk.yellow(options.path)} not found.`);
+          console.error(`${chalk.red("✗")} File or Function not found.`);
         } else {
           console.error(
             `${chalk.red("✗")} Failed to delete file: ${chalk.yellow(error.response.data?.message || "Unknown error")}`,

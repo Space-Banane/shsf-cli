@@ -3,18 +3,15 @@ import { getApiClient } from "../../api.js";
 
 export const fileListDefinition = {
   name: "list",
-  description: "List files in a storage.",
+  description: "List files in a function.",
   options: [
-    { name: "--storage-id <id>", description: "Storage ID", required: true },
-    { name: "--prefix <prefix>", description: "Optional path prefix filter" },
+    { name: "--function-id <id>", description: "Function ID", required: true },
   ],
   action: async (options: any) => {
     const client = await getApiClient();
 
     try {
-      const response = await client.get(`/api/storage/${options.storageId}/files`, {
-        params: options.prefix ? { prefix: options.prefix } : undefined,
-      });
+      const response = await client.get(`/api/function/${options.functionId}/files`);
 
       if (response.status === 200 && response.data.data) {
         const files = response.data.data;
@@ -25,9 +22,9 @@ export const fileListDefinition = {
         }
 
         console.log(chalk.blue("Files:"));
+        console.log(chalk.gray(`${"ID".padEnd(25)} ${"Filename"}`));
         files.forEach((file: any) => {
-          const path = file.path || file.name || "(unknown)";
-          console.log(`- ${chalk.cyan(path)}`);
+          console.log(`${chalk.cyan(file.id.padEnd(25))} ${chalk.white(file.filename)}`);
         });
         console.log(`\n${chalk.green("✓")} Found ${chalk.bgGreen.black(` ${files.length} `)} files.`);
       } else {
