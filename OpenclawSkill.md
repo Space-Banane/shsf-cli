@@ -45,10 +45,10 @@ this will check the health, and if not setup, it will prompt you to set up the C
 - `shsf update namespace <id>`: Update a specific namespace by its ID. (use `shsf update namespace -h` first)
 - `shsf update trigger <functionId> <triggerId>`: Update a specific trigger from a function. (use `shsf update trigger -h` first)
 
-- `shsf file create`: Create a file in a storage. (use `shsf file create -h` first)
-- `shsf file overwrite`: Overwrite an existing file in a storage. (use `shsf file overwrite -h` first)
-- `shsf file delete`: Delete a file from a storage. (use `shsf file delete -h` first)
-- `shsf file list`: List files in a storage. (use `shsf file list -h` first)
+- `shsf file create`: Create/update a file in a function. (use `shsf file create -h` first)
+- `shsf file list`: List files in a function. (use `shsf file list -h` first)
+- `shsf file rename`: Rename a file in a function. (use `shsf file rename -h` first)
+- `shsf file delete`: Delete a file from a function. (use `shsf file delete -h` first)
 
 - `shsf remote pull --id <id> --into <path> [--force]`: Pull files from a function into a local directory.
 - `shsf remote push --id <id> --from <path> [--force]`: Push files from a local directory to a function.
