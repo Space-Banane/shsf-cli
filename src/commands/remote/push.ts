@@ -79,10 +79,18 @@ export const pushDefinition = {
     );
     const currentFiles = currentFilesResponse.data.data; // Expecting { name: string, id: string [...] }[]
 
-    const files = fs.readdirSync(options.from).map((file) => ({
-      filename: file,
-      content: fs.readFileSync(path.join(options.from, file), "utf-8"),
-    }));
+    // Read local files and filter to only include files (exclude directories)
+    const files = fs
+      .readdirSync(options.from)
+      .map((file) => {
+        const filePath = path.join(options.from, file);
+        return { filename: file, filePath };
+      })
+      .filter(({ filePath }) => fs.statSync(filePath).isFile())
+      .map(({ filename, filePath }) => ({
+        filename,
+        content: fs.readFileSync(filePath, "utf-8"),
+      }));
 
     if (!options.force && files.length > 5) {
       console.log(
