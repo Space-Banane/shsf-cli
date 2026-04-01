@@ -4,6 +4,30 @@ import fs from "fs";
 import path from "path";
 import { createHash } from "crypto";
 
+const unpushableFiles = [
+  ".png",
+  ".jpg",
+  ".jpeg",
+  ".gif",
+  ".bmp",
+  ".ico",
+  ".zip",
+  ".tar",
+  ".gz",
+  ".7z",
+  ".pdf",
+  ".doc",
+  ".docx",
+  ".xls",
+  ".xlsx",
+  ".ppt",
+  ".pptx",
+  ".exe",
+  ".dll",
+  ".so",
+  ".dylib"
+];
+
 async function deleteNonexistentFiles(
   currentFiles: any[],
   files: any[],
@@ -14,12 +38,13 @@ async function deleteNonexistentFiles(
   for (const currentFile of currentFiles) {
     if (!files.some((f: any) => f.filename === currentFile.name)) {
       try {
-      await client.delete(
-        `/api/function/${options.id}/file/${currentFile.id}`,
-        {
-          data: { filename: currentFile.name },
-        },
-      );} catch (error: any) {
+        await client.delete(
+          `/api/function/${options.id}/file/${currentFile.id}`,
+          {
+            data: { filename: currentFile.name },
+          },
+        );
+      } catch (error: any) {
         throw error;
       }
       console.log(
@@ -76,9 +101,6 @@ export const pushDefinition = {
           (f: any) => f.name === file.filename,
         );
         if (currentFile) {
-          // If the file content exists in the response, we can hash it. 
-          // Note: currentFiles from /api/function/:id/files might not have content by default depending on API,
-          // but the original code assumes it does.
           const currentFileHash = createHash("md5")
             .update(currentFile.content || "")
             .digest("hex");
@@ -92,14 +114,27 @@ export const pushDefinition = {
           }
         }
 
+        const filenameLower = file.filename.toLowerCase();
+        // Unpushable file check
+        if (unpushableFiles.some((suffix) => filenameLower.endsWith(suffix))) {
+          console.log(
+            chalk.yellow(
+              `Skipping ${file.filename}, it matches unpushable patterns for function ${options.id}`,
+            ),
+          );
+          continue;
+        }
+
         await client.put(`/api/function/${options.id}/file`, {
           filename: file.filename,
           code: file.content,
         });
 
-        const byteSize = Buffer.byteLength(file.content, 'utf8');
+        const byteSize = Buffer.byteLength(file.content, "utf8");
         console.log(
-          chalk.green(`Pushed ${file.filename} (${byteSize} bytes) to function ${options.id}`),
+          chalk.green(
+            `Pushed ${file.filename} (${byteSize} bytes) to function ${options.id}`,
+          ),
         );
         pushedFilesCount++;
       }
