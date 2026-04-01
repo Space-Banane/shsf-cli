@@ -25,7 +25,18 @@ const unpushableFiles = [
   ".exe",
   ".dll",
   ".so",
-  ".dylib"
+  ".dylib",
+  "docker-compose.yml",
+  "docker-compose.yaml",
+  "compose.yaml",
+  "compose.yml",
+  "dockerfile",
+  "dockerfile.dev",
+  "dockerfile.prod",
+  ".gitignore",
+  ".env",
+  ".gitkeep",
+  ".md"
 ];
 
 async function deleteNonexistentFiles(
