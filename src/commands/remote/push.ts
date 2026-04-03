@@ -2,42 +2,15 @@ import chalk from "chalk";
 import { getApiClient } from "../../api.js";
 import fs from "fs";
 import path from "path";
+import {
+  defaultUnpushableFiles,
+  readIgnoreFile,
+  matchesAnyPattern,
+  readMappingFile,
+} from "../../utils/push_helpers.js";
 import { createHash } from "crypto";
 
-const unpushableFiles = [
-  ".png",
-  ".jpg",
-  ".jpeg",
-  ".gif",
-  ".bmp",
-  ".ico",
-  ".zip",
-  ".tar",
-  ".gz",
-  ".7z",
-  ".pdf",
-  ".doc",
-  ".docx",
-  ".xls",
-  ".xlsx",
-  ".ppt",
-  ".pptx",
-  ".exe",
-  ".dll",
-  ".so",
-  ".dylib",
-  "docker-compose.yml",
-  "docker-compose.yaml",
-  "compose.yaml",
-  "compose.yml",
-  "dockerfile",
-  "dockerfile.dev",
-  "dockerfile.prod",
-  ".gitignore",
-  ".env",
-  ".gitkeep",
-  ".md"
-];
+
 
 async function deleteNonexistentFiles(
   currentFiles: any[],
@@ -71,24 +44,45 @@ export const pushDefinition = {
   name: "push",
   description: "Push files to a remote function.",
   options: [
-    { name: "--id <id>", description: "Function ID", required: true },
-    { name: "--from <path>", description: "Source directory", required: true },
+    { name: "--id <id>", description: "Function ID" },
+    { name: "--from <path>", description: "Source directory" },
     { name: "--force", description: "Force overwrite" },
   ],
   action: async (options: any) => {
     const client = await getApiClient();
 
+    // Load mapping if options are missing
+    const mapping = readMappingFile();
+    if (!options.id && mapping?.id) {
+      options.id = mapping.id;
+      console.log(chalk.blue(`Using mapped id ${options.id} from .shsf.json`));
+    }
+    if (!options.from && mapping?.from) {
+      options.from = mapping.from;
+      console.log(chalk.blue(`Using mapped from ${options.from} from .shsf.json`));
+    }
+
+    const hadMapping = !!mapping;
+
+    if (!options.from) {
+      console.error(chalk.red("Source path not provided."));
+      return;
+    }
+
     if (!fs.existsSync(options.from)) {
       console.error(chalk.red(`Source ${options.from} does not exist.`));
       return;
     }
-
     let didDeletion = false; // Track if any deletions were made
 
     const currentFilesResponse = await client.get(
       `/api/function/${options.id}/files`,
     );
     const currentFiles = currentFilesResponse.data.data; // Expecting { name: string, id: string [...] }[]
+
+    // Read ignore patterns from .shsfignore (in source dir or cwd) and merge with defaults
+    const customPatterns = readIgnoreFile(options.from);
+    const combinedPatterns = [...defaultUnpushableFiles, ...customPatterns];
 
     // Read local files and filter to only include files (exclude directories)
     const files = fs
@@ -98,6 +92,7 @@ export const pushDefinition = {
         return { filename: file, filePath };
       })
       .filter(({ filePath }) => fs.statSync(filePath).isFile())
+      .filter(({ filename }) => !matchesAnyPattern(filename, combinedPatterns))
       .map(({ filename, filePath }) => ({
         filename,
         content: fs.readFileSync(filePath, "utf-8"),
@@ -134,8 +129,8 @@ export const pushDefinition = {
         }
 
         const filenameLower = file.filename.toLowerCase();
-        // Unpushable file check
-        if (unpushableFiles.some((suffix) => filenameLower.endsWith(suffix))) {
+        // Unpushable file check (also check custom patterns)
+        if (matchesAnyPattern(filenameLower, combinedPatterns)) {
           console.log(
             chalk.yellow(
               `Skipping ${file.filename}, it matches unpushable patterns for function ${options.id}`,
@@ -187,6 +182,28 @@ export const pushDefinition = {
           `Successfully pushed ${pushedFilesCount} files to function ${options.id}`,
         ),
       );
+
+      // If there was no mapping file and the user provided --id and --from, create a .shsf.json
+      if (!hadMapping && options.id && options.from) {
+        try {
+          const mapPath = path.join(process.cwd(), ".shsf.json");
+          if (!fs.existsSync(mapPath)) {
+            const data = { default: { id: options.id, from: options.from } };
+            fs.writeFileSync(mapPath, JSON.stringify(data, null, 2), { encoding: "utf-8" });
+            console.log("");
+            console.log(
+              chalk.green(`Wrote .shsf.json mapping to ${mapPath}`),
+            );
+            console.log(
+              chalk.blue(
+                `Tip: Next time you can omit --id and --from — the CLI will use values from .shsf.json`,
+              ),
+            );
+          }
+        } catch (err: any) {
+          console.error(chalk.yellow(`Could not write .shsf.json: ${err?.message || err}`));
+        }
+      }
 
       if (didDeletion) {
         console.log("");

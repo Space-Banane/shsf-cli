@@ -63,6 +63,24 @@ this will check the health, and if not setup, it will prompt you to set up the C
 - `shsf req add <package> --id <functionid>`: Add a package to the requirements.txt of a function.
 - `shsf req remove <package> --id <functionid>`: Remove a package from the requirements.txt of a function.
 
+
+### Ignore & Mapping files
+
+`shsf remote push` supports a `.shsfignore` file (gitignore-like) placed in the source directory or repository root. Lines are treated like gitignore patterns and will prevent matching files from being pushed.
+
+You can also create a `.shsf.json` mapping file in the repository root so you don't need to pass `--id` and `--from` every time. Example `.shsf.json`:
+
+```json
+{
+	"default": {
+		"id": "my-function-id",
+		"from": "src/functions/my-fn"
+	}
+}
+```
+
+Command-line flags take precedence over values in `.shsf.json`.
+
 ## Instructions
 Use these commands for when you need to interact with shsf from the command line. Its faster than using the ui for almost all ops.
 

@@ -5,7 +5,6 @@ A powerful command-line interface for managing and interacting with your SHSF in
 [![pnpm](https://img.shields.io/badge/maintained%20with-pnpm-cc3534.svg)](https://pnpm.io/)
 [![TypeScript](https://img.shields.io/badge/built%20with-TypeScript-blue.svg)](https://www.typescriptlang.org/)
 
-
 ## 🚦 Getting Started
 
 ### 📋 Prerequisites
@@ -20,10 +19,13 @@ To install **SHSF CLI** globally on your system:
 ```bash
 pnpm add -g shsf-cli
 ```
-or 
+
+or
+
 ```bash
 npm install -g shsf-cli
 ```
+
 ---
 
 Once installed, simply type:
@@ -31,22 +33,25 @@ Once installed, simply type:
 ```bash
 shsf health
 ```
-and it will ask you for your SHSF instance URL and API token to perform a health check.
 
+and it will ask you for your SHSF instance URL and API token to perform a health check.
 
 ## 🛠️ Usage & Commands
 
 ### 🩺 Health Check
+
 Quickly see if the system is up and running:
+
 ```bash
 shsf health
 ```
 
-
 ### 🏗️ Local Development
+
 If you're contributing or running from source:
 
 1. **Setup**:
+
    ```bash
    git clone https://github.com/Space-Banane/shsf-cli.git
    cd shsf-cli
@@ -59,6 +64,31 @@ If you're contributing or running from source:
    pnpm start [cmd] # Run a command directly
    ```
 
+## Ignore & Mapping files
+
+You can control what files `shsf remote push` ignores using a `.shsfignore` file (gitignore-style).
+
+Place `.shsfignore` in the source directory you're pushing or in the repository root. Examples:
+
+```
+# ignore logs and secrets
+*.log
+secret.txt
+node_modules
+```
+
+You can also create a `.shsf.json` mapping file at the repository root to avoid passing `--id` and `--from` every time. Example:
+
+```json
+{
+  "default": {
+    "id": "my-function-id",
+    "from": "src/functions/my-fn"
+  }
+}
+```
+
+Command-line options always override values from `.shsf.json`.
 
 ## 🤝 Contributing
 
@@ -80,4 +110,3 @@ We love builders! To add a new command:
 ## 📄 License
 
 Licensed under the **MIT-0 License**. Happy coding! 🍌
-
