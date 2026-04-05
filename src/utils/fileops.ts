@@ -34,6 +34,11 @@ export async function renameFile(client: ApiClient, functionId: string, fileId: 
 
 export function handleAxiosError(error: any) {
   if (error.response) {
+    // If the server signals a CLI file failure, stop further commands.
+    if (error.response.data?.cli_file_fail) {
+      console.error(`${chalk.red("✗")} ${error.response.data.message || "File operation blocked by server. (Probably because git is configured)"}`);
+      return { errorType: "cli_file_fail", reason: error.response.data.cli_file_fail, details: error.response };
+    }
     if (error.response.status === 404) {
       console.error(`${chalk.red("✗")} Not found.`);
       return { errorType: "notfound" };
