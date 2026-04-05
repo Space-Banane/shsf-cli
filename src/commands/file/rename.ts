@@ -1,5 +1,6 @@
 import chalk from "chalk";
 import { getApiClient } from "../../api.js";
+import { renameFile, handleAxiosError } from "../../utils/fileops.js";
 
 export const fileRenameDefinition = {
   name: "rename",
@@ -11,29 +12,13 @@ export const fileRenameDefinition = {
   ],
   action: async (options: any) => {
     const client = await getApiClient();
-
     try {
-      const response = await client.patch(`/api/function/${options.functionId}/file/${options.fileId}/rename`, {
-        newFilename: options.newFilename,
-      });
-
-      if (response.status === 200) {
-        console.log(
-          `${chalk.green("✓")} File ${chalk.cyan(options.fileId)} renamed to ${chalk.cyan(options.newFilename)} successfully.`,
-        );
-      } else {
-        console.log(`${chalk.yellow("!")} Unexpected response from server: ${response.status}`);
-      }
+      await renameFile(client, options.functionId, options.fileId, options.newFilename);
+      console.log(
+        `${chalk.green("✓")} File ${chalk.cyan(options.fileId)} renamed to ${chalk.cyan(options.newFilename)} successfully.`,
+      );
     } catch (error: any) {
-      if (error.response) {
-        console.error(
-          `${chalk.red("✗")} Failed to rename file: ${chalk.yellow(error.response.data?.message || "Unknown error")}`,
-        );
-      } else if (error.request) {
-        console.error(`${chalk.red("✗")} No response received from server.`);
-      } else {
-        console.error(`${chalk.red("✗")} Error: ${error.message}`);
-      }
+      handleAxiosError(error);
     }
   },
 };

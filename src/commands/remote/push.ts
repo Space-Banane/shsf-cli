@@ -12,10 +12,12 @@ import { createHash } from "crypto";
 
 
 
+import type { ApiClient } from "../../types/apiClient.js";
+
 async function deleteNonexistentFiles(
   currentFiles: any[],
   files: any[],
-  client: any,
+  client: ApiClient,
   options: any,
 ): Promise<{ didDeletion: boolean }> {
   let didDeletion = false;
