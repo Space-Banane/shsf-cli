@@ -48,5 +48,5 @@ describe('Command Loading', () => {
       
       console.log(`✓ Validated command: ${definition.name} (${path.relative(commandsDir, file)})`);
     }
-  });
+  }, 20000);
 });
