@@ -38,7 +38,7 @@ export const updateTriggerDefinition = {
     const client = await getApiClient();
 
     try {
-      const response = await client.patch(`/api/functions/${functionId}/triggers/${triggerId}`, data);
+      const response = await client.put(`/api/functions/${functionId}/triggers/${triggerId}`, data);
 
       if (response.status === 200) {
         console.log(
