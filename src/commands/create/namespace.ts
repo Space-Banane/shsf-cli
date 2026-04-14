@@ -17,7 +17,7 @@ export const createNamespaceDefinition = {
     const client = await getApiClient();
 
     try {
-      const response = await client.post("/api/namespaces", data);
+      const response = await client.post("/api/namespace", data);
 
       if (response.status === 200 || response.status === 201) {
         console.log(
