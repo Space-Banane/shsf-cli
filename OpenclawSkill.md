@@ -30,6 +30,7 @@ this will check the health, and if not setup, it will prompt you to set up the C
 - `shsf delete trigger <functionId> <triggerId>`: Deletes a specific trigger from a function.
 
 - `shsf get function <id>`: Get details of a specific function by its ID.
+- `shsf get exec-url [--id <id>]`: Get the execution URL for a function. Falls back to `.shsf.json` for the function ID and also prints the alias URL when the function has an `executionAlias`.
 - `shsf get namespace <id>`: Get details of a specific namespace by its ID
 - `shsf get trigger <functionId> <triggerId>`: Get details of a specific trigger from a function.
 
@@ -81,6 +82,12 @@ You can also create a `.shsf.json` mapping file in the repository root so you do
 
 Command-line flags take precedence over values in `.shsf.json`.
 
+This mapping can also be used with `shsf get exec-url`, so from a mapped function directory you can run:
+
+```bash
+shsf get exec-url
+```
+
 ## Instructions
 Use these commands for when you need to interact with shsf from the command line. Its faster than using the ui for almost all ops.
 
@@ -94,6 +101,18 @@ shsf uiurl
 After creating a function and receiving an ID (for example, 81), you can share the following URL with your human so they can view the function in the UI:
 ```
 [UI_URL]/functions/[ID]
+```
+
+To get the function execution URL from the CLI:
+
+```bash
+shsf get exec-url --id 81
+```
+
+If the function has an execution alias configured, the CLI also prints the alias form:
+
+```text
+[API_URL]/exec/[executionAlias]
 ```
 
 ## Update

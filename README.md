@@ -46,6 +46,22 @@ Quickly see if the system is up and running:
 shsf health
 ```
 
+### 🔗 Execution URL
+
+Get a function's execution URL by ID:
+
+```bash
+shsf get exec-url --id <id>
+```
+
+If your repo has a `.shsf.json` mapping with an `id`, you can omit `--id`:
+
+```bash
+shsf get exec-url
+```
+
+The command prints the standard execution URL and, when available, the alias URL based on the function's `executionAlias`.
+
 ### 🏗️ Local Development
 
 If you're contributing or running from source:
