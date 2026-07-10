@@ -1,6 +1,6 @@
 {
   "name": "shsf-cli",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "description": "Production-ready command-line interface and agent bridge for SHSF.",
   "type": "module",
   "files": [
