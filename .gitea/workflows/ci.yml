@@ -49,8 +49,8 @@ jobs:
       - name: Package dist
         run: zip -r dist.zip dist package.json README.md
 
-      - name: Upload dist artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload dist artifact to Gitea
+        uses: actions/upload-artifact@v3
         with:
           name: shsf-cli-dist
           path: dist.zip
@@ -107,15 +107,24 @@ jobs:
       - name: Create Gitea release
         env:
           GITEA_TOKEN: ${{ secrets.GITEA_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ -z "${GITEA_TOKEN}" ]; then
-            echo "GITEA_TOKEN is not configured; skipping Gitea release."
+          TOKEN="${GITEA_TOKEN:-${GITHUB_TOKEN:-}}"
+          if [ -z "${TOKEN}" ]; then
+            echo "No Gitea token is configured; skipping Gitea release."
             exit 0
           fi
           VERSION="$(node -p "require('./package.json').version")"
-          API="${GITEA_SERVER_URL%/}/api/v1/repos/${GITEA_REPOSITORY}/releases"
-          curl -sSf \
-            -H "Authorization: token ${GITEA_TOKEN}" \
+          SERVER_URL="${GITEA_SERVER_URL:-${GITHUB_SERVER_URL}}"
+          REPOSITORY="${GITEA_REPOSITORY:-${GITHUB_REPOSITORY}}"
+          API="${SERVER_URL%/}/api/v1/repos/${REPOSITORY}/releases"
+          RELEASE_JSON="$(curl -sSf \
+            -H "Authorization: token ${TOKEN}" \
             -H "Content-Type: application/json" \
             -d "{\"tag_name\":\"v${VERSION}\",\"target_commitish\":\"${GITHUB_SHA}\",\"name\":\"v${VERSION}\",\"body\":\"Automated SHSF CLI release v${VERSION}\",\"draft\":false,\"prerelease\":false}" \
-            "$API"
+            "$API")"
+          RELEASE_ID="$(node -e "const fs=require('fs'); const data=JSON.parse(fs.readFileSync(0, 'utf8')); process.stdout.write(String(data.id));" <<< "${RELEASE_JSON}")"
+          curl -sSf \
+            -H "Authorization: token ${TOKEN}" \
+            -F "attachment=@dist.zip" \
+            "${API}/${RELEASE_ID}/assets?name=dist.zip"
