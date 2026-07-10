@@ -14,6 +14,7 @@ export async function getApiClient(): Promise<AxiosInstance> {
   
   apiClient = axios.create({
     baseURL: config.SHSF_INSTANCE,
+    timeout: 120_000,
     headers: {
       'x-access-key': config.SHSF_TOKEN,
       'Content-Type': 'application/json',

@@ -56,6 +56,13 @@ async function promptForConfig(): Promise<SHSFConfig> {
 }
 
 export async function loadConfig(): Promise<SHSFConfig> {
+  if (process.env.SHSF_INSTANCE && process.env.SHSF_TOKEN) {
+    return {
+      SHSF_INSTANCE: process.env.SHSF_INSTANCE,
+      SHSF_TOKEN: process.env.SHSF_TOKEN,
+    };
+  }
+
   const configPath = getConfigPath();
 
   if (!fs.existsSync(configPath)) {

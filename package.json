@@ -1,7 +1,7 @@
 {
   "name": "shsf-cli",
   "version": "2.3.1",
-  "description": "",
+  "description": "Production-ready command-line interface and agent bridge for SHSF.",
   "type": "module",
   "files": [
     "dist"
@@ -18,7 +18,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT-0",
   "packageManager": "pnpm@10.30.0",
   "devDependencies": {
     "@types/inquirer": "^9.0.9",

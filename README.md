@@ -1,128 +1,130 @@
-# 🚀 SHSF CLI
+# SHSF CLI
 
-A powerful command-line interface for managing and interacting with your SHSF instance. Built with TypeScript and designed for developers, it provides a seamless experience to perform health checks, run tests, and more—all from your terminal.
+Production-ready command-line tooling for SHSF instances. The CLI manages functions, namespaces, files, triggers, storage, environment variables, CORS, execution, logs, rate limits, and exposes the live SHSF REST and MCP surfaces for agents.
 
-[![pnpm](https://img.shields.io/badge/maintained%20with-pnpm-cc3534.svg)](https://pnpm.io/)
-[![TypeScript](https://img.shields.io/badge/built%20with-TypeScript-blue.svg)](https://www.typescriptlang.org/)
+## Requirements
 
-## 🚦 Getting Started
+- Node.js 22 or newer
+- pnpm 10 or newer
+- An SHSF access token
 
-### 📋 Prerequisites
-
-- **Node.js** (v22+)
-- **pnpm** (preferred)
-
-### 📦 Installation
-
-To install **SHSF CLI** globally on your system:
+## Install
 
 ```bash
 pnpm add -g shsf-cli
 ```
 
-or
+From source:
 
 ```bash
-npm install -g shsf-cli
+pnpm install
+pnpm build
+pnpm start -- health
 ```
 
----
+## Configuration
 
-Once installed, simply type:
+The CLI reads configuration in this order:
+
+1. `SHSF_INSTANCE` and `SHSF_TOKEN` environment variables.
+2. `~/.shsf_config`, created interactively on first use.
+
+Example non-interactive configuration:
 
 ```bash
+export SHSF_INSTANCE=https://shsf.example.com
+export SHSF_TOKEN=token_xxx
 shsf health
 ```
 
-and it will ask you for your SHSF instance URL and API token to perform a health check.
-
-## 🛠️ Usage & Commands
-
-### 🩺 Health Check
-
-Quickly see if the system is up and running:
+## Core Commands
 
 ```bash
 shsf health
+shsf uiurl
+shsf create namespace --name apps
+shsf create function --name api --description "API handler" --image python:3.13 --startup-file main.py --namespace-id 1 --allow-http true
+shsf update function 42 --cache-enabled true --cache-ttl 60 --network-restricted true
+shsf get function 42
+shsf get exec-url --id 42
+shsf function execute --id 42 --payload '{"name":"Ada"}' --route users/list --method POST --no-stream
 ```
 
-### 🔗 Execution URL
-
-Get a function's execution URL by ID:
+Files can be synchronized from a local directory:
 
 ```bash
-shsf get exec-url --id <id>
+shsf remote push --id 42 --from ./functions/api --force
+shsf remote pull --id 42 --to ./functions/api
 ```
 
-If your repo has a `.shsf.json` mapping with an `id`, you can omit `--id`:
-
-```bash
-shsf get exec-url
-```
-
-The command prints the standard execution URL and, when available, the alias URL based on the function's `executionAlias`.
-
-### 🏗️ Local Development
-
-If you're contributing or running from source:
-
-1. **Setup**:
-
-   ```bash
-   git clone https://github.com/Space-Banane/shsf-cli.git
-   cd shsf-cli
-   pnpm install
-   ```
-
-2. **Run**:
-   ```bash
-   pnpm build      # Build the project
-   pnpm start [cmd] # Run a command directly
-   ```
-
-## Ignore & Mapping files
-
-You can control what files `shsf remote push` ignores using a `.shsfignore` file (gitignore-style).
-
-Place `.shsfignore` in the source directory you're pushing or in the repository root. Examples:
-
-```
-# ignore logs and secrets
-*.log
-secret.txt
-node_modules
-```
-
-You can also create a `.shsf.json` mapping file at the repository root to avoid passing `--id` and `--from` every time. Example:
+Use `.shsfignore` for gitignore-style push exclusions and `.shsf.json` for local mappings:
 
 ```json
 {
   "default": {
-    "id": "my-function-id",
-    "from": "src/functions/my-fn"
+    "id": "42",
+    "from": "functions/api"
   }
 }
 ```
 
-Command-line options always override values from `.shsf.json`.
+## Current SHSF Features
 
-## 🤝 Contributing
+Typed commands cover the common stable workflows:
 
-We love builders! To add a new command:
+- `create|get|update|delete namespace`
+- `create|get|update|delete function`
+- function execution, dependency install, logs, logging config, rate-limit config
+- file create/list/rename/delete
+- trigger create/get/update/delete plus run-now
+- storage create/list/delete, item get/set/delete/clear
+- function and account-level environment variables
+- CORS origin list/add/remove/clear
+- function counts and health checks
 
-1. Create a `.ts` file in `src/commands/`.
-2. Export a definition object:
-   ```typescript
-   export const myCommand = {
-     name: "run-test",
-     description: "Explanation of what it does",
-     action: async () => { ... }
-   };
-   ```
-3. Run `pnpm build` and test it with `shsf run-test`.
+The live backend also exposes admin, global settings, Git source, import/replace, guest, AI, account export, OpenAPI, and MCP routes. Use `shsf api request` for any route without a specialized wrapper:
 
----
+```bash
+shsf api openapi
+shsf api request GET /api/functions
+shsf api request PATCH /api/function/42/logging --data '{"enabled":true,"hide_payload_headers":true}'
+shsf api request POST /api/function/42/git/pull
+```
 
-## 📄 License
+## Agent Use
 
-Licensed under the **MIT-0 License**. Happy coding! 🍌
+SHSF exposes an MCP server at `/mcp`. The CLI has direct wrappers for agent bootstrap and tool calls:
+
+```bash
+shsf mcp info
+shsf mcp init
+shsf mcp tools
+shsf mcp docs
+shsf mcp call list_functions --args '{"namespace":"apps"}'
+shsf mcp call write_file --args '{"id":42,"filename":"main.py","content":"def main(args): return {\"ok\": True}"}'
+```
+
+Agents should call `shsf mcp docs` before writing SHSF function code. The docs include runtime entry points, `args` shape, v2 response envelope, routing, dependencies, storage, and absolute platform rules.
+
+## CI/CD
+
+This repository uses Gitea Actions in `.gitea/workflows/ci.yml`.
+
+- Build job: checkout, pnpm setup, Node 24, pnpm-store cache, install, test, build, package artifact.
+- Publish job on `main`: rebuilds, publishes to npm when `NPM_TOKEN` is configured, and creates a Gitea release when `GITEA_TOKEN` is configured.
+
+GitHub Actions and Copilot-specific instructions were removed.
+
+## Development
+
+```bash
+pnpm test
+pnpm build
+pnpm test:coverage
+```
+
+Add a command by creating a file under `src/commands`. Export an object with `name`, `description`, optional `options`, and `action`. Directory names become command groups automatically.
+
+## License
+
+MIT-0

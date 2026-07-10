@@ -8,6 +8,8 @@ export const functionExecuteDefinition = {
   options: [
     { name: "--id <id>", description: "Function ID", required: true },
     { name: "--payload <json>", description: "JSON payload for execution", required: false },
+    { name: "--route <path>", description: "Function sub-route to execute", required: false },
+    { name: "--method <method>", description: "HTTP method forwarded to the function", required: false },
     { name: "--no-stream", description: "Disable streaming and get final result only", required: false, default: false },
   ],
   action: async (options: any) => {
@@ -26,6 +28,12 @@ export const functionExecuteDefinition = {
         console.error(`${chalk.red("✗")} Invalid JSON payload: ${chalk.yellow(error.message)}`);
         return;
       }
+    }
+    if (options.route) {
+      payload = { ...payload, route: options.route };
+    }
+    if (options.method) {
+      payload = { ...payload, method: String(options.method).toUpperCase() };
     }
 
     const handleJsonChunk = (chunk: string) => {

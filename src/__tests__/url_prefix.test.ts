@@ -19,26 +19,33 @@ function getFilesRecursively(dir: string): string[] {
 }
 
 describe('API URL validation', () => {
-  it('should ensure all API client calls start with /api/', () => {
+  it('should ensure API client calls use known SHSF route prefixes', () => {
     const tsFiles = getFilesRecursively('src');
     const violations: string[] = [];
 
     // Regex to match common patterns like client.get('/path') or client.post(`/path`)
-    // specifically looking for paths that start with / but NOT /api/ or /health
-    const urlPattern = /client\.(get|post|put|delete|patch)\(['"`]\/(?!(api|health)\/)[^'"`]+['"`]/g;
+    // specifically looking for paths that start with / but NOT known SHSF prefixes.
+    const urlPattern = /client\.(get|post|put|delete|patch)\(['"`]\/(?!(api|health|mcp)(\/|['"`]))[^'"`]+['"`]/g;
 
     tsFiles.forEach(file => {
       const content = readFileSync(file, 'utf-8');
       let match;
       while ((match = urlPattern.exec(content)) !== null) {
-        // Double check for exact /health match (without trailing slash)
-        if (match[0].includes("'/health'") || match[0].includes('"/health"') || match[0].includes('`/health`')) {
+        // Double check exact non-API endpoints without trailing slash.
+        if (
+          match[0].includes("'/health'") ||
+          match[0].includes('"/health"') ||
+          match[0].includes('`/health`') ||
+          match[0].includes("'/mcp'") ||
+          match[0].includes('"/mcp"') ||
+          match[0].includes('`/mcp`')
+        ) {
           continue;
         }
         violations.push(`${file}: ${match[0]}`);
       }
     });
 
-    expect(violations, `Found API calls not starting with /api/:\n${violations.join('\n')}`).toHaveLength(0);
+    expect(violations, `Found client calls outside known SHSF prefixes:\n${violations.join('\n')}`).toHaveLength(0);
   });
 });

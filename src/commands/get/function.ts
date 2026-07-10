@@ -25,6 +25,12 @@ async function getFunction(id: string) {
       console.log(`${chalk.yellow("Description:")} ${f.description || chalk.gray("No description")}`);
       console.log(`${chalk.yellow("Image:")}       ${f.image}`);
       console.log(`${chalk.yellow("Startup File:")} ${f.startup_file}`);
+      console.log(`${chalk.yellow("HTTP:")}        ${f.allow_http ? "enabled" : "disabled"}`);
+      console.log(`${chalk.yellow("Cache:")}       ${f.cache_enabled ? `enabled (${f.cache_ttl}s)` : "disabled"}`);
+      console.log(`${chalk.yellow("Network:")}     ${f.network_restricted ? "restricted" : "allowed"}`);
+      console.log(`${chalk.yellow("Max RAM:")}     ${f.max_ram ?? chalk.gray("default")}`);
+      console.log(`${chalk.yellow("Timeout:")}     ${f.timeout ?? chalk.gray("default")}`);
+      console.log(`${chalk.yellow("Tags:")}        ${f.tags || chalk.gray("none")}`);
       
       if (f.namespace) {
         console.log(`${chalk.yellow("Namespace:")}    ${f.namespace.name} (${f.namespace.id})`);
